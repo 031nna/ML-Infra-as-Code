@@ -1,5 +1,5 @@
 # ML-Infra-as-Code
-Sample end to end IAC of ML deployment and management.
+🚀 Project: Predictive Aircraft Part Replacement System (Predictive Maintenance ML Pipeline)
 
 
 Training guide: https://d1.awsstatic.com/training-and-certification/docs-machine-learning-engineer-associate/AWS-Certified-Machine-Learning-Engineer-Associate_Exam-Guide.pdf
