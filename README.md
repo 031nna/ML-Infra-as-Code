@@ -11,6 +11,7 @@ Dataset: NASA CMAPSS Jet Engine Simulated Data https://catalog.data.gov/dataset/
 
 
 Video tutorial on sagemaker: https://www.youtube.com/watch?v=Ld2oTLY47sA
+Video on AI Engineering: https://www.youtube.com/watch?v=j_StCjwpfmk
 ```
     ┌────────────┐
     │   Dataset  │  
