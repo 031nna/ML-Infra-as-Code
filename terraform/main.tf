@@ -24,7 +24,7 @@ provider "cloudflare" {
 }
 
 provider "aws" {
-    profile = "aws_staging"
+    profile = "aws_david_dev"
     region  = var.aws_region
 }
 
