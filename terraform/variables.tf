@@ -19,10 +19,6 @@ variable "aws_profile" {
 
 # NB: For 30,000 users/day use the equivalent of s-4vcpu-8gb 
 # or betterstill split into two servers (s-2vcpu-4gb x 2)  https://slugs.do-api.dev/
-
-
-
-
 variable "instance_count" {
     description = "number of running droplets"
     type = number
