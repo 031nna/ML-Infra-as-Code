@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "assume_role" {
 
 data "aws_sagemaker_prebuilt_ecr_image" "test" {
   repository_name = "kmeans"
-  tag             = "1" # specify a tag (required in most regions)
+  # tag             = "1" # specify a tag (required in most regions)
 }
 
 ###########################
