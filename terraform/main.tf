@@ -1,81 +1,80 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
     }
   }
 }
 
 provider "aws" {
-    profile = var.aws_profile
-    region  = var.aws_region
+  profile = var.aws_profile
+  region  = var.aws_region
 }
 
-provider "external" {}
+###########################
+# IAM ROLE FOR SAGEMAKER
+###########################
 
-data "external" "enable_brotli" {
-  program = ["bash", "../bin/enable_brotli.sh"]
+resource "aws_iam_role" "sagemaker_execution_role" {
+  name = "sagemaker-execution-role" # REQUIRED
 
-  query = {
-    zone_id  = var.cloudflare_zone_id
-    api_token = var.cloudflare_token
-  }
-}
-  
-
-
-####################
-#### aws configs 
-
-resource "aws_instance" "staging" {
-  count         = var.staging_instance_count
-  ami           = var.ami_id #"ami-09e67e426f25ce0d7"  # Amazon Linux 2023 (Free Tier)
-  instance_type = var.instance_type
-  key_name      = var.aws_key_name
-  security_groups = [aws_security_group.staging_sg.name]
-  associate_public_ip_address = true
-
-  root_block_device {
-    volume_size = var.ebs_volume_size  # 10GB Free Tier
-  }
-
-  user_data = file("../bin/user_data.sh")  # Bootstrap script
-
-  tags = {
-    Name = "Giggl-Staging"
-  }
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-resource "aws_security_group" "staging_sg" {
-  name        = "staging-sg"
-  description = "Allow HTTP, HTTPS, and SSH"
+# Minimal permissions for SageMaker to access S3 + CloudWatch
+resource "aws_iam_role_policy" "sagemaker_policy" {
+  name = "sagemaker-policy"
+  role = aws_iam_role.sagemaker_execution_role.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect : "Allow",
+        Action : [
+          "s3:*",
+          "logs:*"
+        ],
+        Resource : "*"
+      }
+    ]
+  })
+}
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    principals {
+      type        = "Service"
+      identifiers = ["sagemaker.amazonaws.com"]
+    }
   }
 }
- 
+
+###########################
+# PREBUILT CONTAINER IMAGE
+###########################
+
+data "aws_sagemaker_prebuilt_ecr_image" "test" {
+  repository_name = "kmeans"
+  tag             = "1" # specify a tag (required in most regions)
+}
+
+###########################
+# SAGEMAKER MODEL
+###########################
+
+resource "aws_sagemaker_model" "sagemaker_execution_model" {
+  name               = "my-model"
+  execution_role_arn = aws_iam_role.sagemaker_execution_role.arn
+
+  primary_container {
+    image = data.aws_sagemaker_prebuilt_ecr_image.test.registry_path
+
+    # Optional: environment variables for inference
+    environment = {
+      SAGEMAKER_PROGRAM = "inference.py"
+    }
+  }
+}
