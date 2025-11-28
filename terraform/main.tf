@@ -81,7 +81,7 @@ resource "aws_sagemaker_model" "sagemaker_execution_model" {
 
 
 resource "aws_sagemaker_notebook_instance" "ml_notebook" {
-  name          = "obi-ml-notebook"
+  name          = "david-ml-notebook"
   instance_type = "ml.t2.medium"   # free-tier/dev-friendly
   role_arn      = aws_iam_role.sagemaker_execution_role.arn
 
