@@ -6,9 +6,9 @@ variable "admin_user" {
   description = "Nizzles mail"
 }
 
-variable "droplet_image" {
-  description = "Image identifier of the OS in DigitalOcean"
-  default     = "ubuntu-20-04-x64"
+variable "instance_type" {
+  description = "Image identifier of the OS "
+  default     = "ml.t2.medium" 
 }
 
 variable "aws_profile" {
