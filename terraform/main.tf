@@ -11,81 +11,136 @@ provider "aws" {
   region  = var.aws_region
 }
 
-###########################
-# IAM ROLE FOR SAGEMAKER
-###########################
 
-resource "aws_iam_role" "sagemaker_execution_role" {
-  name = "sagemaker-execution-role" # REQUIRED
 
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+########################################
+# 1️⃣ VPC + Subnets
+########################################
+resource "aws_vpc" "davids_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = { Name = "davids-vpc" }
 }
 
-# Minimal permissions for SageMaker to access S3 + CloudWatch
-resource "aws_iam_role_policy" "sagemaker_policy" {
-  name = "sagemaker-policy"
-  role = aws_iam_role.sagemaker_execution_role.id
+resource "aws_subnet" "davids_subnet_a" {
+  vpc_id                  = aws_vpc.davids_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = { Name = "davids-subnet-a" }
+}
 
-  policy = jsonencode({
+resource "aws_subnet" "davids_subnet_b" {
+  vpc_id                  = aws_vpc.davids_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
+  tags = { Name = "davids-subnet-b" }
+}
+
+resource "aws_security_group" "davids_sg" {
+  name        = "davids-sg"
+  description = "Allow SageMaker Studio access"
+  vpc_id      = aws_vpc.davids_vpc.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+########################################
+# 2️⃣ IAM Role
+########################################
+resource "aws_iam_role" "sagemaker_execution_role" {
+  name = "sagemaker-execution-role"
+
+  assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect : "Allow",
-        Action : [
-          "s3:*",
-          "logs:*"
-        ],
-        Resource : "*"
+        Effect = "Allow",
+        Principal = { Service = "sagemaker.amazonaws.com" },
+        Action = "sts:AssumeRole"
       }
     ]
   })
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
+resource "aws_iam_role_policy_attachment" "sagemaker_full_access" {
+  role       = aws_iam_role.sagemaker_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}
 
-    principals {
-      type        = "Service"
-      identifiers = ["sagemaker.amazonaws.com"]
+resource "aws_iam_role_policy_attachment" "s3_full_access" {
+  role       = aws_iam_role.sagemaker_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+########################################
+# 3️⃣ SageMaker Domain
+########################################
+resource "aws_sagemaker_domain" "davids_domain" {
+  domain_name = "davids_domain"
+  auth_mode   = "IAM"
+  vpc_id      = aws_vpc.davids_vpc.id
+  subnet_ids  = [
+    aws_subnet.davids_subnet_a.id,
+    aws_subnet.davids_subnet_b.id
+  ]
+  app_network_access_type = "PublicInternetOnly"
+
+  default_user_settings {
+    execution_role = aws_iam_role.sagemaker_execution_role.arn
+    security_groups = [aws_security_group.davids_sg.id]
+    jupyter_server_app_settings {
+      default_resource_spec {
+        instance_type = "ml.t2.medium"
+      }
     }
   }
 }
 
-###########################
-# PREBUILT CONTAINER IMAGE
-###########################
+########################################
+# 4️⃣ SageMaker User Profile
+########################################
+resource "aws_sagemaker_user_profile" "user_dave" {
+  domain_id         = aws_sagemaker_domain.davids_domain.id
+  user_profile_name = "dave"
 
-data "aws_sagemaker_prebuilt_ecr_image" "test" {
-  repository_name = "kmeans"
-  # tag             = "1" # specify a tag (required in most regions)
-}
+  user_settings {
+    execution_role  = aws_iam_role.sagemaker_execution_role.arn
+    security_groups = [aws_security_group.davids_sg.id]
 
-###########################
-# SAGEMAKER MODEL
-###########################
-
-resource "aws_sagemaker_model" "sagemaker_execution_model" {
-  name               = "my-model"
-  execution_role_arn = aws_iam_role.sagemaker_execution_role.arn
-
-  primary_container {
-    image = data.aws_sagemaker_prebuilt_ecr_image.test.registry_path
-
-    # Optional: environment variables for inference
-    environment = {
-      SAGEMAKER_PROGRAM = "inference.py"
+    jupyter_server_app_settings {
+      default_resource_spec {
+        instance_type = "ml.t2.medium"
+      }
     }
   }
 }
 
-
-resource "aws_sagemaker_notebook_instance" "ml_notebook" {
-  name          = "david-ml-notebook"
-  instance_type = var.instance_type  # free-tier/dev-friendly
+########################################
+# 5️⃣ SageMaker Notebook Instance (optional, linked to user)
+########################################
+resource "aws_sagemaker_notebook_instance" "dave_notebook" {
+  name          = "dave-notebook"
+  instance_type = "ml.t2.medium"
   role_arn      = aws_iam_role.sagemaker_execution_role.arn
 
+  # Optional: tags for tracking
   tags = {
     Project = "PredictiveMaintenancePrototype"
+    User    = "dave"
   }
 }
