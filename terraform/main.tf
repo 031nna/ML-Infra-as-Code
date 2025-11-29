@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "s3_full_access" {
 # 3️⃣ SageMaker Domain
 ########################################
 resource "aws_sagemaker_domain" "davids_domain" {
-  domain_name = "davids_domain"
+  domain_name = "davids-domain"
   auth_mode   = "IAM"
   vpc_id      = aws_vpc.davids_vpc.id
   subnet_ids  = [
