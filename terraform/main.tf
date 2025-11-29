@@ -105,7 +105,7 @@ resource "aws_sagemaker_domain" "davids_domain" {
     security_groups = [aws_security_group.davids_sg.id]
     jupyter_server_app_settings {
       default_resource_spec {
-        instance_type = var.instance_type
+        instance_type =  "system"
       }
     }
   }
