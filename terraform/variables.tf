@@ -1,7 +1,7 @@
 # Default values
 variable "instance_type" {
   description = "Image identifier of the OS "
-  default     = "ml.t2.medium" 
+  default     = "ml.t3.medium" 
 }
 
 variable "aws_profile" {

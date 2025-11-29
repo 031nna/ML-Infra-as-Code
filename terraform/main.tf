@@ -105,7 +105,7 @@ resource "aws_sagemaker_domain" "davids_domain" {
     security_groups = [aws_security_group.davids_sg.id]
     jupyter_server_app_settings {
       default_resource_spec {
-        instance_type = "ml.t2.medium"
+        instance_type = var.instance_type
       }
     }
   }
@@ -124,7 +124,7 @@ resource "aws_sagemaker_user_profile" "user_dave" {
 
     jupyter_server_app_settings {
       default_resource_spec {
-        instance_type = "ml.t2.medium"
+        instance_type = var.instance_type
       }
     }
   }
@@ -135,7 +135,7 @@ resource "aws_sagemaker_user_profile" "user_dave" {
 ########################################
 resource "aws_sagemaker_notebook_instance" "dave_notebook" {
   name          = "dave-notebook"
-  instance_type = "ml.t2.medium"
+  instance_type = var.instance_type
   role_arn      = aws_iam_role.sagemaker_execution_role.arn
 
   # Optional: tags for tracking
