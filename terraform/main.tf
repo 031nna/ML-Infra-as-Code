@@ -124,7 +124,7 @@ resource "aws_sagemaker_user_profile" "user_dave" {
 
     jupyter_server_app_settings {
       default_resource_spec {
-        instance_type = var.instance_type
+        instance_type = "system"
       }
     }
   }
