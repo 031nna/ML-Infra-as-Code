@@ -2,6 +2,7 @@
 🚀 Project: Predictive Aircraft Part Replacement System (Predictive Maintenance ML Pipeline)
 
 
+
 Training guide: https://d1.awsstatic.com/training-and-certification/docs-machine-learning-engineer-associate/AWS-Certified-Machine-Learning-Engineer-Associate_Exam-Guide.pdf
 
 Dataset: NASA CMAPSS Jet Engine Simulated Data https://catalog.data.gov/dataset/cmapss-jet-engine-simulated-data
