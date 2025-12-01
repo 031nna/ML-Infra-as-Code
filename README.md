@@ -9,6 +9,8 @@ Dataset: NASA CMAPSS Jet Engine Simulated Data https://catalog.data.gov/dataset/
 
 Sagemaker dashboard:https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebooks-and-git-repos
 
+Sagemaker video tutorial:https://youtu.be/Ld2oTLY47sA?t=3743
+
 ```
     ┌────────────┐
     │   Dataset  │  
