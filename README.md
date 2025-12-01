@@ -9,6 +9,9 @@ Research: https://chatgpt.com/c/6921f965-f438-8327-b23f-df2efdf89573
 
 Dataset: NASA CMAPSS Jet Engine Simulated Data https://catalog.data.gov/dataset/cmapss-jet-engine-simulated-data
 
+AWS console: https://us-east-2.console.aws.amazon.com/console/home?nc2=h_si&refid=da5a4023-2af6-4275-9a1e-478c6572e2c6&region=us-east-2&src=header-signin#
+
+Sagemaker dashboard:https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebooks-and-git-repos
 
 Video tutorial on sagemaker: https://youtu.be/Ld2oTLY47sA?t=3743
 
