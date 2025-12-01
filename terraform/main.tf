@@ -14,7 +14,7 @@ provider "aws" {
 
 
 ########################################
-# 1️⃣ VPC + Subnets
+# VPC + Subnets
 ########################################
 resource "aws_vpc" "my_vpc" {
   cidr_block           = "10.0.0.0/16"
@@ -60,7 +60,7 @@ resource "aws_security_group" "my_sg" {
 }
 
 ########################################
-# 2️⃣ IAM Role
+# IAM Role
 ########################################
 resource "aws_iam_role" "sagemaker_execution_role" {
   name = "sagemaker-execution-role"
@@ -88,7 +88,7 @@ resource "aws_iam_role_policy_attachment" "s3_full_access" {
 }
 
 ########################################
-# 3️⃣ SageMaker Domain
+# SageMaker Domain
 ########################################
 resource "aws_sagemaker_domain" "my_domain" {
   domain_name = "my-domain"
@@ -112,7 +112,7 @@ resource "aws_sagemaker_domain" "my_domain" {
 }
 
 ########################################
-# 4️⃣ SageMaker User Profile
+#  SageMaker User Profile
 ########################################
 resource "aws_sagemaker_user_profile" "user_dave" {
   domain_id         = aws_sagemaker_domain.my_domain.id
@@ -131,7 +131,7 @@ resource "aws_sagemaker_user_profile" "user_dave" {
 }
 
 ########################################
-# 5️⃣ SageMaker Notebook Instance (optional, linked to user)
+# SageMaker Notebook Instance (optional, linked to user)
 ########################################
 resource "aws_sagemaker_notebook_instance" "dave_notebook" {
   name          = "dave-notebook"
