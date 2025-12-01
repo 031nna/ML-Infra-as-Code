@@ -10,7 +10,8 @@ Research: https://chatgpt.com/c/6921f965-f438-8327-b23f-df2efdf89573
 Dataset: NASA CMAPSS Jet Engine Simulated Data https://catalog.data.gov/dataset/cmapss-jet-engine-simulated-data
 
 
-Video tutorial on sagemaker: https://www.youtube.com/watch?v=Ld2oTLY47sA
+Video tutorial on sagemaker: https://youtu.be/Ld2oTLY47sA?t=3743
+
 ```
     ┌────────────┐
     │   Dataset  │  
