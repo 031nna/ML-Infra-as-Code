@@ -58,9 +58,12 @@ node_modules
 # Local .terraform directories
 **/.terraform/*
 **/.terraform.*
-# .tfstate files
-# *.tfstate
+# Terraform
+*.tfstate
 *.tfstate.*
+.terraform/
+
+
 
 # Crash log files
 crash.log
