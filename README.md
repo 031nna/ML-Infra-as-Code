@@ -50,3 +50,18 @@ Sagemaker video tutorial:https://youtu.be/Ld2oTLY47sA?t=3743
      Frontend / Service
 
 ```
+
+
+Security note: Terraform state files are intentionally excluded from version control and should be stored securely using a remote backend (e.g., S3 with state locking).
+
+```
+terraform {
+  backend "s3" {
+    bucket         = "example-terraform-state"
+    key            = "ml-infra/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+```
